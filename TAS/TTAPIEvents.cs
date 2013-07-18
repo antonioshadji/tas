@@ -22,7 +22,13 @@ namespace TAS
         private object m_lock = new object();
         private string username = string.Empty;
         private string password = string.Empty;
-        private string[] clargs;
+        private string ttContract = string.Empty;
+        private string ttProduct = "CLT";
+        private string ttAccount = "HARDCODE";
+        private int BQ = 100;
+        private int SQ = 100;
+        private int BP = 0;
+        private int SP = 1;
         private bool ready = true;
 
  
@@ -32,17 +38,17 @@ namespace TAS
         }
         public TTAPIEvents(string u, string p)
         {
-            Debug.WriteLine("TTAPI starting for user: {0}", u);
+            Console.WriteLine("TTAPI starting for user: {0}", u);
             username = u;
             password = p;
 
         }
-        public TTAPIEvents(string u, string p, string[] args)
+        public TTAPIEvents(string u, string p, string args)
         {
-            Debug.WriteLine("TTAPIFunctions::Constructor called with {0}, {1}, {2}", u, p, args.ToString());
+            Console.WriteLine("TTAPIFunctions::Constructor called with {0}, {1}, {2}", u, p, args);
             username = u;
             password = p;
-            clargs = args;
+            ttContract = args;
         } 
         #endregion
 
@@ -102,7 +108,7 @@ namespace TAS
             {
                 Console.WriteLine("TT Login Succeeded: {0}", e.Status.StatusMessage);
                 // Add code here to begin working with the TT API
-                loadOrders();
+                subscribeContracts(MarketKey.Cme, ProductType.Future, ttProduct, ttContract);
 
             }
             else
@@ -111,6 +117,8 @@ namespace TAS
                 Dispose();
             }
         }
+
+ 
 
         /// <summary>
         /// Shuts down the TT API

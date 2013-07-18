@@ -19,15 +19,19 @@ namespace TAS
                DateTime.Now.Date);
         
             string ttUserId = string.Empty;
-            string ttPassword = string.Empty; 
+            string ttPassword = string.Empty;
+            string ttContractMonth = string.Empty;
 
             if (args.Length >= 2)
             {
                 ttUserId = args[0];
-                ttPassword = args[1];
+                ttPassword = args[1];   
             }
 
-           using (TTAPIEvents tt = new TTAPIEvents(ttUserId, ttPassword))
+            if (args.Length >= 3)
+            { ttContractMonth = args[2]; }
+
+            using (TTAPIEvents tt = new TTAPIEvents(ttUserId, ttPassword, ttContractMonth))
            {
                tt.Start(); 
            }

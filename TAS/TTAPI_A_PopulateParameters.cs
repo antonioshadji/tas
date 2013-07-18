@@ -14,6 +14,13 @@ namespace TAS
     public partial class TTAPIEvents
     {
 
+        private void loadContracts()
+        {
+            throw new NotImplementedException();
+        }
+        
+        
+        
         DataSet xmlData = new DataSet("OrderSet");
         DataTable orders;
 
@@ -21,7 +28,7 @@ namespace TAS
         {
             try
             {
-                xmlData.ReadXmlSchema("ORDERS.xsd");
+                //xmlData.ReadXmlSchema("ORDERS.xsd");
                 xmlData.ReadXml("ORDERS.XML");
             }
             catch (Exception ex)
@@ -53,11 +60,11 @@ namespace TAS
                 //<ProductType>FUTURE</ProductType>
                 //<ProductName>CL</ProductName>
                 //<Contract>AUG13</Contract>
-                subscribeContracts(
-                    mkt((string)r["Exchange"]),
-                    pt((string)r["ProductType"]),
-                    (string)r["ProductName"],
-                    (string)r["Contract"]);
+                //subscribeContracts(
+                //    mkt((string)r["Exchange"]),
+                //    pt((string)r["ProductType"]),
+                //    (string)r["ProductName"],
+                //    (string)r["Contract"]);
 
             }
 

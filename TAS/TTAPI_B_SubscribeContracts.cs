@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Diagnostics;
 using System.Data;
 
@@ -13,7 +13,7 @@ namespace TAS
 
     public partial class TTAPIEvents
     {
-
+        Stopwatch sw = new Stopwatch();
         List<string> api_products = new List<string>();
 
         public void subscribeContracts(MarketKey market, ProductType type, string product, string contract)
@@ -59,7 +59,7 @@ namespace TAS
                 priceSub.FieldsUpdated += new FieldsUpdatedEventHandler(priceSub_FieldsUpdated);
                 priceSub.Start();
 
-                insertInstrumentToTable(e.Instrument);
+                //insertInstrumentToTable(e.Instrument);
             }
             else if (e.IsFinal)
             {
@@ -74,11 +74,22 @@ namespace TAS
         {
             if (e.Error == null)
             {
-
                 //TODO debug only change to preopen for release
-                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.Trading))
+                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.PreOpen ))
                 {
-                    releaseOrders(ready);
+
+                    sw.Start();
+                    if (ready)
+                    {
+                        submitOrder(e.Fields.Instrument, BuySell.Buy, BQ, BP, ttAccount, AccountType.Agent1);
+                        submitOrder(e.Fields.Instrument, BuySell.Sell, SQ, SP, ttAccount, AccountType.Agent1);
+                        sw.Stop();
+                        ready = false;
+                        Console.WriteLine(sw);
+                        writeLog(sw);
+
+                    }
+                   
                 }
                 else
                 { 
@@ -108,6 +119,14 @@ namespace TAS
             { return ProductType.Spread; }
             else
             { return ProductType.Invalid; }
+        }
+
+        public void writeLog(object value)
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"stopwatch.txt"))
+            {
+                file.WriteLine(value);
+            }
         }
 
 
