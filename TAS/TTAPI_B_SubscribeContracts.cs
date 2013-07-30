@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Diagnostics;
-using System.Data;
 
 namespace TAS
 {
     using TradingTechnologies.TTAPI;
-    using TradingTechnologies.TTAPI.Tradebook;
 
     public partial class TTAPIEvents
     {
@@ -30,6 +25,7 @@ namespace TAS
             {
                 req.Update += new EventHandler<InstrumentLookupSubscriptionEventArgs>(instrumentLookupSub);
                 req.Start();
+                Console.WriteLine("Price subscription requested"); 
                 api_products.Add(inst);
             }
 
@@ -75,18 +71,18 @@ namespace TAS
             if (e.Error == null)
             {
                 //TODO debug only change to preopen for release
-                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.PreOpen ))
+                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.Trading ))
                 {
 
-                    sw.Start();
+                    //sw.Start();
                     if (ready)
                     {
                         submitOrder(e.Fields.Instrument, BuySell.Buy, BQ, BP, ttAccount, AccountType.Agent1);
                         submitOrder(e.Fields.Instrument, BuySell.Sell, SQ, SP, ttAccount, AccountType.Agent1);
                         sw.Stop();
                         ready = false;
-                        Console.WriteLine(sw);
-                        writeLog(sw);
+                      //  Console.WriteLine(sw.ElapsedMilliseconds);
+                        //writeLog(sw.ElapsedMilliseconds);
 
                     }
                    

@@ -1,46 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Data;
 
 namespace TAS
 {
     using TradingTechnologies.TTAPI;
-    using TradingTechnologies.TTAPI.Tradebook;
 
     public partial class TTAPIEvents
     {
-
-        private void releaseOrders(bool trade_ready)
-        {
-            if (trade_ready)
-            {
-                foreach (DataRow r in orders.Rows)
-                {
-
-                    if (!(bool)r["sent"])
-                    {
-                        submitOrder(
-                            (Instrument)r["Instrument"],
-                            (BuySell)r["BS"],
-                            (int)r["qty"],
-                            (int)r["price"],
-                            (string)r["Account"],
-                            (AccountType)r["AccoutnType"]);
-                        r["sent"] = true;
-                    }
-                    else
-                    { Console.WriteLine("already sent"); }
-                }
-            }
-            else
-            { Console.WriteLine(DateTime.Now.TimeOfDay.ToString() +  " Waiting..."); }
-        }
-
-
         public void submitOrder(
             Instrument instrument, 
             BuySell bs,  
@@ -70,6 +36,7 @@ namespace TAS
                 {
                     Console.WriteLine(
                         string.Format("Send Order Success : {0}", prof.SiteOrderKey));
+
                 }
             }
             else

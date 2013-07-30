@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace TAS
 {
 
     using TradingTechnologies.TTAPI;
-    using TradingTechnologies.TTAPI.Tradebook;
 
     public partial class TTAPIEvents : IDisposable
     {
@@ -43,15 +38,26 @@ namespace TAS
             password = p;
 
         }
-        public TTAPIEvents(string u, string p, string args)
+
+        //  TTAPIEvents(ttUserId, ttPassword, ttAccount, 
+          //          ttProduct, ttContractMonth,
+            //        qty, BuyPrice, SellPrice )))
+        public TTAPIEvents(string u, string p, string a, string prod, string contract, int Q, int bprc, int sprc )
+          
         {
-            Console.WriteLine("TTAPIFunctions::Constructor called with {0}, {1}, {2}", u, p, args);
             username = u;
             password = p;
-            ttContract = args;
+            ttAccount = a;
+            ttProduct = prod;
+            ttContract = contract;
+            BQ = Q;
+            SQ = Q;
+            BP = bprc;
+            SP = sprc;
+
         } 
         #endregion
-
+        
         
         /// <summary>
         /// Create and start the Dispatcher
@@ -106,17 +112,18 @@ namespace TAS
         {
             if (e.Status.IsSuccess)
             {
-                Console.WriteLine("TT Login Succeeded: {0}", e.Status.StatusMessage);
+                Console.WriteLine("TT API User Authentication Succeeded: {0}", e.Status.StatusMessage);
                 // Add code here to begin working with the TT API
                 subscribeContracts(MarketKey.Cme, ProductType.Future, ttProduct, ttContract);
-
             }
             else
             {
-                Console.WriteLine("TT Login failed: {0}", e.Status.StatusMessage);
+                Console.WriteLine("TT API User Authentication failed: {0}", e.Status.StatusMessage);
                 Dispose();
             }
         }
+
+
 
  
 

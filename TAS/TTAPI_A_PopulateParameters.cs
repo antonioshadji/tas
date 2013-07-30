@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Data;
 
 namespace TAS
 {
     using TradingTechnologies.TTAPI;
-    using TradingTechnologies.TTAPI.Tradebook;
 
     public partial class TTAPIEvents
     {
@@ -115,5 +110,12 @@ namespace TAS
             return words;
         }
 
+        object createOrder(string[] rawdata)
+        {
+            Dictionary<string, object> d = new Dictionary<string,object>();
+
+            return d;
+       
+        }
     }
 }
