@@ -24,8 +24,7 @@ namespace TAS
             if (!api_products.Contains(inst))
             {
                 req.Update += new EventHandler<InstrumentLookupSubscriptionEventArgs>(instrumentLookupSub);
-                req.Start();
-                Console.WriteLine("Price subscription requested"); 
+                req.Start(); 
                 api_products.Add(inst);
             }
 
@@ -55,12 +54,17 @@ namespace TAS
                 priceSub.FieldsUpdated += new FieldsUpdatedEventHandler(priceSub_FieldsUpdated);
                 priceSub.Start();
 
-                //insertInstrumentToTable(e.Instrument);
+                Console.WriteLine("Orders to be submitted on trading status Pre-Open:");
+                Console.WriteLine("Contract: {0}", e.Instrument.Name);
+                Console.WriteLine("Buy {0} for {1}", BQ, BP);
+                Console.WriteLine("Sell {0} at {1}", SQ, SP);
+                Console.WriteLine("Waiting for Pre-Open...");
             }
             else if (e.IsFinal)
             {
                 // Instrument was not found and TT API has given up looking for it
                 Console.WriteLine("Instrument was NOT found: {0}", e.Error);
+                Console.WriteLine("WARNING!!!!! NO ORDERS WILL BE SENT!!!!");
             }
         }
 
@@ -70,28 +74,17 @@ namespace TAS
         {
             if (e.Error == null)
             {
-                //TODO debug only change to preopen for release
-                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.Trading ))
+                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.PreOpen ))
                 {
-
-                    //sw.Start();
                     if (ready)
                     {
                         submitOrder(e.Fields.Instrument, BuySell.Buy, BQ, BP, ttAccount, AccountType.Agent1);
                         submitOrder(e.Fields.Instrument, BuySell.Sell, SQ, SP, ttAccount, AccountType.Agent1);
-                        sw.Stop();
                         ready = false;
-                      //  Console.WriteLine(sw.ElapsedMilliseconds);
-                        //writeLog(sw.ElapsedMilliseconds);
-
                     }
                    
                 }
-                else
-                { 
-                    Console.WriteLine("{0} Status: {1}",
-                        DateTime.Now.TimeOfDay, e.Fields.GetSeriesStatusField().Value);
-                }
+
             }
             else
             {
@@ -125,18 +118,6 @@ namespace TAS
             }
         }
 
-
-        public void TEST_instrumentLookup()
-        {
-            InstrumentLookupSubscription req = new InstrumentLookupSubscription(
-                        apiInstance.Session,
-                        Dispatcher.Current,
-                        new ProductKey(MarketKey.Cme, ProductType.Future, "CLT"),
-                        "AUG13");
-            req.Update += new EventHandler<InstrumentLookupSubscriptionEventArgs>(instrumentLookupSub);
-            req.Start();
-
-        }
 
 
 

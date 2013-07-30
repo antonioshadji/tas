@@ -25,6 +25,7 @@ namespace TAS
         private int BP = 0;
         private int SP = 1;
         private bool ready = true;
+        private bool display_orders = true; 
 
  
         #region Constructors
