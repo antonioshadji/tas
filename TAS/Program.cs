@@ -8,9 +8,7 @@ namespace TAS
         static void Main(string[] args)
         {
             Console.WriteLine("{0}", Environment.GetCommandLineArgs()[0]);
-            Console.WriteLine("started at: {0} on {1}",
-               DateTime.Now.TimeOfDay,
-               DateTime.Now.Date);
+            Console.WriteLine("started at: {0}",DateTime.Now);
         
             string ttUserId = string.Empty;
             string ttPassword = string.Empty;

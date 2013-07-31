@@ -8,8 +8,9 @@ namespace TAS
 
     public partial class TTAPIEvents
     {
-        Stopwatch sw = new Stopwatch();
         List<string> api_products = new List<string>();
+        TradingStatus market_state = TradingStatus.Unknown;
+
 
         public void subscribeContracts(MarketKey market, ProductType type, string product, string contract)
         {
@@ -82,8 +83,18 @@ namespace TAS
                         submitOrder(e.Fields.Instrument, BuySell.Sell, SQ, SP, ttAccount, AccountType.Agent1);
                         ready = false;
                     }
-                   
+                 
                 }
+
+                if (!Equals(e.Fields.GetSeriesStatusField().Value, market_state))
+                {
+                    market_state = e.Fields.GetSeriesStatusField().Value;
+                    Console.WriteLine("{0}: Current Market State is : {1}", 
+                        DateTime.Now.TimeOfDay,
+                        market_state);
+                    
+                }
+
 
             }
             else
