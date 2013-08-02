@@ -7,6 +7,7 @@ namespace TAS
         //args contains only command line parameters if any.
         static void Main(string[] args)
         {
+            //Environment.GetCommandLineArgs starts with executable name, then command line args
             Console.WriteLine("{0}", Environment.GetCommandLineArgs()[0]);
             Console.WriteLine("started at: {0}",DateTime.Now);
         
@@ -36,9 +37,15 @@ namespace TAS
                 BuyPrice = Convert.ToInt16(args[6]);
                 SellPrice = Convert.ToInt16(args[7]);
 
-                using (TTAPIEvents tt = new TTAPIEvents(ttUserId, ttPassword, ttAccount,
-                    ttProduct, ttContractMonth,
-                    qty, BuyPrice, SellPrice))
+                using (TTAPIEvents tt = new TTAPIEvents(
+                    ttUserId, 
+                    ttPassword, 
+                    ttAccount,
+                    ttProduct, 
+                    ttContractMonth,
+                    qty, 
+                    BuyPrice, 
+                    SellPrice))
                 {
                     tt.Start();
                 }

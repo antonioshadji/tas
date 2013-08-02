@@ -26,7 +26,6 @@ namespace TAS
                 prof.OrderType = OrderType.Limit;
                 prof.LimitPrice = Price.FromInt(instrument, prc);
 
-
                 if (!instrument.Session.SendOrder(prof))
                 {
                     Console.WriteLine(
