@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 
 namespace TAS
 {
@@ -8,114 +9,59 @@ namespace TAS
 
     public partial class TTAPIEvents
     {
+        public string account_number = string.Empty;
+        public string account_type = string.Empty;
+        public List<string> order_instructions = new List<string>();
 
-        private void loadContracts()
+
+        public void readParameters(string iniFileName)
         {
-            throw new NotImplementedException();
-        }
-        
-        
-        
-        DataSet xmlData = new DataSet("OrderSet");
-        DataTable orders;
+            string line;
 
-        public void loadOrders()
-        {
-            try
+            // Read the file and display it line by line.
+            if (File.Exists(iniFileName))
             {
-                //xmlData.ReadXmlSchema("ORDERS.xsd");
-                xmlData.ReadXml("ORDERS.XML");
-            }
-            catch (Exception ex)
-            { Console.WriteLine(ex.ToString()); }
+                char[] delimiter = {' '};
+                System.IO.StreamReader file = new System.IO.StreamReader(iniFileName);
 
-            orders = xmlData.Tables["Orders"];
-            try
-            {
-                orders.Columns.Add("Instrument", typeof(Instrument));
-                orders.Columns.Add("sent", typeof(bool));
-                orders.Columns.Add("BS", typeof(BuySell));
-                orders.AcceptChanges();
-            }
-            catch (Exception ex)
-            { Console.WriteLine(ex.ToString()); }
-
-
-            foreach (DataRow r in orders.Rows)
-            {
-                r["sent"] = false;
-                string display_order = "";
-                foreach (DataColumn c in orders.Columns)
+                
+                while ((line = file.ReadLine()) != null)
                 {
-                    display_order += (r[c] + " ");
-                }
-                Console.WriteLine(display_order);
+                    string[] p = line.Split(delimiter);
 
-                //<Exchange>CME</Exchange>
-                //<ProductType>FUTURE</ProductType>
-                //<ProductName>CL</ProductName>
-                //<Contract>AUG13</Contract>
-                //subscribeContracts(
-                //    mkt((string)r["Exchange"]),
-                //    pt((string)r["ProductType"]),
-                //    (string)r["ProductName"],
-                //    (string)r["Contract"]);
-
-            }
-
-        }
-
-        public void insertInstrumentToTable(Instrument inst)
-        {
-            string[] contractDef = extractDataFromInstrument(inst);
-
-            foreach (DataRow r in orders.Rows)
-            {
-                if (string.Equals(r["Exchange"].ToString().ToLower(), contractDef[0].ToLower()))
-                {
-                    if (string.Equals(r["ProductName"].ToString().ToLower(), contractDef[1].ToLower()))
+                    switch (p[0].ToUpper())
                     {
-                        if (string.Equals(r["Contract"].ToString().ToLower(), contractDef[2].ToLower()))
-                        {
-                            try
+                        case "ACCOUNT:":
+                            account_number = p[1];
+                            account_type = p[2];
+                            break;
+                        case "CONTRACT:":
+                            subscribeContracts(mkt(p[1]), p[2], prodtype(p[3]) , p[4]);
+                            while ((line = file.ReadLine()) != null)
                             {
-                                r["Instrument"] = inst;
-                                if (string.Equals(r["BuySell"], "BUY"))
-                                { r["BS"] = BuySell.Buy; }
-                                else if (string.Equals(r["BuySell"], "SELL"))
-                                { r["BS"] = BuySell.Sell; }
-                                r.AcceptChanges();
-                                Console.WriteLine("Instrument saved: {0}", inst.Name);
+                                order_instructions.Add(line);
                             }
-                            catch (Exception ex)
-                            { Console.WriteLine("ERROR: {0}", ex.ToString()); }
-                        }
+
+                            break;
+
+                        default:
+                            break;
                     }
+
                 }
+
+                file.Close();
             }
-
-
-
-            //Console.WriteLine("Product: {0}", inst.Product);
-            //Console.WriteLine("Key: {0}", inst.Key);
-            //Console.WriteLine("Full Name: {0}", inst.GetFormattedName(InstrumentNameFormat.Full));
-            //Console.WriteLine("Name: {0}", inst.Name);
-          
+            else
+            { 
+                Console.WriteLine(iniFileName +" is not found! no orders application will exit");
+                Console.ReadKey();
+                Environment.Exit(1);
+            }
+            
         }
 
-        public string[] extractDataFromInstrument(Instrument inst)
-        {
-            string[] words = inst.Name.Split(' ');
 
-            return words;
-        }
-
-        object createOrder(string[] rawdata)
-        {
-            Dictionary<string, object> d = new Dictionary<string,object>();
-
-            return d;
-       
-        }
+      
     }
 }

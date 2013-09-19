@@ -17,15 +17,10 @@ namespace TAS
         private object m_lock = new object();
         private string username = string.Empty;
         private string password = string.Empty;
-        private string ttContract = string.Empty;
-        private string ttProduct = "CLT";
-        private string ttAccount = "HARDCODE";
-        private int BQ = 100;
-        private int SQ = 100;
-        private int BP = 0;
-        private int SP = 1;
+        private string ttConfig = "orders.ini";
+
         private bool ready = true;
-        private bool display_orders = true; 
+
 
  
         #region Constructors
@@ -40,21 +35,12 @@ namespace TAS
 
         }
 
-        //  TTAPIEvents(ttUserId, ttPassword, ttAccount, 
-          //          ttProduct, ttContractMonth,
-            //        qty, BuyPrice, SellPrice )))
-        public TTAPIEvents(string u, string p, string a, string prod, string contract, int Q, int bprc, int sprc )
+        public TTAPIEvents(string u, string p, string c)
           
         {
             username = u;
             password = p;
-            ttAccount = a;
-            ttProduct = prod;
-            ttContract = contract;
-            BQ = Q;
-            SQ = Q;
-            BP = bprc;
-            SP = sprc;
+            ttConfig = c;
 
         } 
         #endregion
@@ -114,8 +100,9 @@ namespace TAS
             if (e.Status.IsSuccess)
             {
                 Console.WriteLine("TT API User Authentication Succeeded: {0}", e.Status.StatusMessage);
+                
                 // Add code here to begin working with the TT API
-                subscribeContracts(MarketKey.Cme, ProductType.Future, ttProduct, ttContract);
+                readParameters(ttConfig);
             }
             else
             {

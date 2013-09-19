@@ -9,11 +9,14 @@ namespace TAS
     public partial class TTAPIEvents
     {
         List<string> api_products = new List<string>();
+
         TradingStatus market_state = TradingStatus.Unknown;
+  
 
-
-        public void subscribeContracts(MarketKey market, ProductType type, string product, string contract)
+        public void subscribeContracts(MarketKey market, string product, ProductType type, string contract)
         {
+            Console.WriteLine("Subscribe to {0} {1} {2} {3}", market, product, type, contract);
+
             InstrumentLookupSubscription req = new InstrumentLookupSubscription(
                     apiInstance.Session,
                     Dispatcher.Current,
@@ -22,11 +25,13 @@ namespace TAS
             
             string inst = string.Concat(market, type, product, contract);
 
+
             if (!api_products.Contains(inst))
             {
                 req.Update += new EventHandler<InstrumentLookupSubscriptionEventArgs>(instrumentLookupSub);
                 req.Start(); 
                 api_products.Add(inst);
+
             }
 
 
@@ -47,6 +52,8 @@ namespace TAS
                 Console.WriteLine("Instrument was found: {0}",
                     e.Instrument.GetFormattedName(InstrumentNameFormat.Full));
 
+               CreateOrders(e.Instrument, e.Instrument.GetValidOrderFeeds()[0]);
+
                 // Subscribe for Inside Market Data
                 PriceSubscription priceSub = new PriceSubscription(e.Instrument,
                     Dispatcher.Current);
@@ -55,11 +62,8 @@ namespace TAS
                 priceSub.FieldsUpdated += new FieldsUpdatedEventHandler(priceSub_FieldsUpdated);
                 priceSub.Start();
 
-                Console.WriteLine("Orders to be submitted on trading status Pre-Open:");
-                Console.WriteLine("Contract: {0}", e.Instrument.Name);
-                Console.WriteLine("Buy {0} for {1}", BQ, BP);
-                Console.WriteLine("Sell {0} at {1}", SQ, SP);
-                Console.WriteLine("Waiting for Pre-Open...");
+
+                Console.WriteLine("Price Subcription started: Waiting for Pre-Open...");
             }
             else if (e.IsFinal)
             {
@@ -71,18 +75,43 @@ namespace TAS
 
 
 
+
+        
         private void priceSub_FieldsUpdated(object sender, FieldsUpdatedEventArgs e)
         {
+            
             if (e.Error == null)
             {
-                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.PreOpen ))
+                
+                if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.PreOpen  ))
                 {
+                    //Stopwatch sw = new Stopwatch();
+                    //Stopwatch sw2 = new Stopwatch();
+                    //sw.Start();
+                    //sw2.Start();
                     if (ready)
                     {
-                        submitOrder(e.Fields.Instrument, BuySell.Buy, BQ, BP, ttAccount, AccountType.Agent1);
-                        submitOrder(e.Fields.Instrument, BuySell.Sell, SQ, SP, ttAccount, AccountType.Agent1);
+                        
+                        foreach (OrderProfile prof in orders)
+                        {
+                            if (apiInstance.Session.SendOrder(prof))
+                            {
+                                //sw.Stop();
+                                Console.WriteLine("Send Order Success : {0}", prof.SiteOrderKey);
+                                //Console.WriteLine(sw.Elapsed);
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("Send Order failed : {0}", prof.RoutingStatus.Message); 
+                            }
+                        }
+                        //sw2.Stop();
+                        //Console.WriteLine(sw2.Elapsed);
+
                         ready = false;
                     }
+             
                  
                 }
 
@@ -105,20 +134,29 @@ namespace TAS
 
         private MarketKey mkt(string market)
         {
-            if (string.Equals(market.ToUpper(), "CME"))
-            { return MarketKey.Cme; }
-            else
-            { return MarketKey.Invalid; }
+            switch (market.ToUpper())
+            {
+                case "CME":
+                    return MarketKey.Cme; 
+                case "ICE":
+                    return MarketKey.Ice;
+                default:
+                    return MarketKey.Invalid; 
+            }
         }
 
-        private ProductType pt(string type)
+
+        public ProductType prodtype(string pt)
         {
-            if (string.Equals(type.ToUpper(), "FUTURE"))
-            { return ProductType.Future; }
-            else if (string.Equals(type.ToUpper(), "SPREAD"))
-            { return ProductType.Spread; }
-            else
-            { return ProductType.Invalid; }
+            switch (pt.ToUpper())
+            {
+                case "FUTURE":
+                    return ProductType.Future;
+                case "SPREAD":
+                    return ProductType.Spread;
+                default:
+                    return ProductType.Invalid;
+            }
         }
 
         public void writeLog(object value)
