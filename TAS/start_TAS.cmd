@@ -1,3 +1,3 @@
-: Parameters after TAS.exe USERNAME PASSWORD Account# Product_Code Contract_Month_MMMYY Quantity BuyPrice SellPrice
+: Parameters after TAS.exe USERNAME PASSWORD single_contract_order_list_file
 start TAS.exe ANTONIOS 1234 clt.txt
 start TAS.exe ANTONIOS 1234 rbt.txt
