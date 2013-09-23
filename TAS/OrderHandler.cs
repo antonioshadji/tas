@@ -5,11 +5,23 @@ namespace TAS
 {
     using TradingTechnologies.TTAPI;
 
-    public partial class TTAPIEvents
+    public class OrderHandler
     {
         public List<OrderProfile> orders = new List<OrderProfile>();
 
-        private void CreateOrders(Instrument instrument, OrderFeed orderfeed)
+        private string account_number = string.Empty;
+        private string account_type = string.Empty;
+
+        //constructor
+        public OrderHandler(string acct, string acctType)
+        {
+            
+            account_number = acct;
+            account_type = acctType;
+            
+        }
+
+        public void CreateOrders(Instrument instrument, OrderFeed orderfeed, List<string> order_instructions)
         {
             char[] delimiter = { ' ' };
 
@@ -19,7 +31,7 @@ namespace TAS
                 OrderProfile profile = new OrderProfile(orderfeed, instrument);
                 profile.OrderType = OrderType.Limit;
                 profile.AccountName = account_number;
-                profile.AccountType = acctType(account_type);
+                profile.AccountType = TTAPI_Utility.acctType(account_type);
                 
                 string[] p = order.Split(delimiter);
                 if (p.Length == 3)
@@ -45,26 +57,7 @@ namespace TAS
             Console.WriteLine("order count: {0}", orders.Count);
         }
         
-        private AccountType acctType(string type)
-        {
-
-            switch (type)
-            {
-                case "A1":
-                    return AccountType.Agent1; 
-                case "M1":
-                    return AccountType.MarketMaker1; 
-                case "P1":
-                    return AccountType.Principal1; 
-                case "G1":
-                    return AccountType.GiveUp1; 
-                case "U1":
-                    return AccountType.Unallocated1; 
-                default:
-                    return AccountType.None;
-            }
-
-        }
+     
 
     }
 }

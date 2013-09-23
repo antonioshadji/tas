@@ -2,6 +2,8 @@
 
 namespace TAS
 {
+    using TradingTechnologies.TTAPI;
+
     class Program
     {
         //args contains only command line parameters if any.
@@ -13,7 +15,8 @@ namespace TAS
         
             string ttUserId = string.Empty;
             string ttPassword = string.Empty;
-            string ttConfig = string.Empty;           
+            string ttConfig = string.Empty;
+
 
             if (args.Length == 3)
             {
@@ -22,7 +25,7 @@ namespace TAS
                 ttConfig = args[2];
 
 
-                using (TTAPIEvents tt = new TTAPIEvents(
+                using (TTAPI_Events tt = new TTAPI_Events(
                     ttUserId, 
                     ttPassword, 
                     ttConfig))

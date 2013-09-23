@@ -6,7 +6,7 @@ namespace TAS
 
     using TradingTechnologies.TTAPI;
 
-    public partial class TTAPIEvents : IDisposable
+    public class TTAPI_Events : IDisposable
     {
         /// <summary>
         /// Declare the TTAPI objects
@@ -24,18 +24,8 @@ namespace TAS
 
  
         #region Constructors
-        private TTAPIEvents()
-        {
-        }
-        public TTAPIEvents(string u, string p)
-        {
-            Console.WriteLine("TTAPI starting for user: {0}", u);
-            username = u;
-            password = p;
-
-        }
-
-        public TTAPIEvents(string u, string p, string c)
+   
+        public TTAPI_Events(string u, string p, string c)
           
         {
             username = u;
@@ -102,7 +92,16 @@ namespace TAS
                 Console.WriteLine("TT API User Authentication Succeeded: {0}", e.Status.StatusMessage);
                 
                 // Add code here to begin working with the TT API
-                readParameters(ttConfig);
+                PopulateParameters data = new PopulateParameters(ttConfig);
+                OrderHandler OrderManager = new OrderHandler(data.account_number, data.account_type);
+                InstrumentSubscription sub = new InstrumentSubscription(data, apiInstance.Session);
+
+
+                Console.ReadKey();
+                OrderManager.CreateOrders(sub.instrument, sub.orderfeed, data.order_instructions);
+                sub.orders = OrderManager.orders;
+                sub.ready = true;
+
             }
             else
             {

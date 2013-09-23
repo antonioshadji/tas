@@ -6,7 +6,7 @@ namespace TAS
 {
     using TradingTechnologies.TTAPI;
 
-    public partial class TTAPIEvents
+    public partial class TTAPI_Events
     {
         List<string> api_products = new List<string>();
 

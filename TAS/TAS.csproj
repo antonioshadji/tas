@@ -37,7 +37,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -67,13 +69,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TTAPI_C_SubmitOrder.cs" />
+    <Compile Include="InstrumentSubscription.cs" />
+    <Compile Include="PopulateParameters.cs" />
+    <Compile Include="OrderHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="TTAPIEvents.cs" />
-    <Compile Include="TTAPI_A_PopulateParameters.cs" />
-    <Compile Include="TTAPI_B_SubscribeContracts.cs" />
+    <Compile Include="TTAPI_Events.cs" />
+    <Compile Include="TTAPI_Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
