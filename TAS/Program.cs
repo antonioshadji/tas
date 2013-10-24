@@ -1,5 +1,6 @@
 ﻿using System;
 
+
 namespace TAS
 {
     class Program
@@ -10,7 +11,8 @@ namespace TAS
             //Environment.GetCommandLineArgs starts with executable name, then command line args
             Console.WriteLine("{0}", Environment.GetCommandLineArgs()[0]);
             Console.WriteLine("started at: {0}",DateTime.Now);
-        
+            System.Diagnostics.Debug.WriteLine("test Debug");
+            
             string ttUserId = string.Empty;
             string ttPassword = string.Empty;
             string ttConfig = string.Empty;           
