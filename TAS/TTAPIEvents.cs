@@ -13,7 +13,6 @@ namespace TAS
         /// </summary>
         private UniversalLoginTTAPI apiInstance = null;
         private WorkerDispatcher workDispatch = null;
-        private bool disposed = false;
         private object m_lock = new object();
         private string username = string.Empty;
         private string password = string.Empty;
@@ -59,10 +58,27 @@ namespace TAS
         /// </summary>
         public void Init()
         {
-            // Use "Universal Login" Login Mode
-            TTAPI.UniversalLoginModeDelegate ulDelegate = new
-            TTAPI.UniversalLoginModeDelegate(ttApiInitComplete);
-            TTAPI.CreateUniversalLoginTTAPI(Dispatcher.Current, ulDelegate);
+            // Use "Universal Login" Login Mode)
+            ApiInitializeHandler d = new ApiInitializeHandler(ttApiInitHandler);
+            TTAPI.CreateUniversalLoginTTAPI(Dispatcher.Current, username, password, d);
+        }
+
+        private void ttApiInitHandler(TTAPI api, ApiCreationException ex)
+        {
+            if (ex == null)
+            {
+                Console.WriteLine("TT API Initialization Succeeded");
+                // Authenticate your credentials
+                apiInstance = (UniversalLoginTTAPI)api;
+                apiInstance.AuthenticationStatusUpdate += new
+                EventHandler<AuthenticationStatusUpdateEventArgs>(
+                apiInstance_AuthenticationStatusUpdate);
+                apiInstance.Start();
+            }
+            else if (!ex.IsRecoverable)
+            {
+                Console.WriteLine("TT API Initialization Failed: {0}", ex.Message);
+            }
         }
 
         /// <summary>
@@ -70,21 +86,7 @@ namespace TAS
         /// </summary>
         public void ttApiInitComplete(UniversalLoginTTAPI api, Exception ex)
         {
-            if (ex == null)
-            {
-                Console.WriteLine("TT API Initialization Succeeded");
-                // Authenticate your credentials
-                apiInstance = api;
-                apiInstance.AuthenticationStatusUpdate += new
-                EventHandler<AuthenticationStatusUpdateEventArgs>(
-                apiInstance_AuthenticationStatusUpdate);
-                apiInstance.Authenticate(username, password);
-            }
-            else
-            {
-                Console.WriteLine("TT API Initialization Failed: {0}", ex.Message);
-                Dispose();
-            }
+
         }
 
         /// <summary>
@@ -112,26 +114,15 @@ namespace TAS
         /// </summary>
         public void Dispose()
         {
-            Debug.WriteLine("TTAPIFunctions::Dispose method called");
-            lock (m_lock)
-            {
-                if (!disposed)
-                {
-                    // Shutdown the TT API
-                    if (apiInstance != null)
-                    {
-                        apiInstance.Shutdown();
-                        apiInstance = null;
-                    }
-                    // Shutdown the Dispatcher
-                    if (workDispatch != null)
-                    {
-                        workDispatch.BeginInvokeShutdown();
-                        workDispatch = null;
-                    }
-                    disposed = true;
-                }
-            }
+            // Shutdown the TT API
+            TTAPI.ShutdownCompleted += new EventHandler(TTAPI_ShutdownCompleted);
+            TTAPI.Shutdown();
+
+        }
+
+        public void TTAPI_ShutdownCompleted(object sender, EventArgs e)
+        {
+            // Dispose of your other objects / resources
         }
 
         }

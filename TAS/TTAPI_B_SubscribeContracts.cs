@@ -52,7 +52,19 @@ namespace TAS
                 Console.WriteLine("Instrument was found: {0}",
                     e.Instrument.GetFormattedName(InstrumentNameFormat.Full));
 
-               CreateOrders(e.Instrument, e.Instrument.GetValidOrderFeeds()[0]);
+                OrderFeed order_feed=null;
+                foreach (OrderFeed of in e.Instrument.GetValidOrderFeeds())
+                {
+                    if (of.IsTradingEnabled)
+                    {
+                        order_feed = of;
+                        break;
+                    }
+                }
+                if (!Equals(order_feed, null))
+                { CreateOrders(e.Instrument, order_feed); }
+                else
+                { Console.WriteLine("Order creation failed for {0}", e.Instrument.Name); }
 
                 // Subscribe for Inside Market Data
                 PriceSubscription priceSub = new PriceSubscription(e.Instrument,
@@ -80,7 +92,7 @@ namespace TAS
         private void priceSub_FieldsUpdated(object sender, FieldsUpdatedEventArgs e)
         {
             
-            if (e.Error == null)
+            try
             {
                 
                 if (Equals(e.Fields.GetSeriesStatusField().Value, TradingStatus.PreOpen  ))
@@ -108,11 +120,8 @@ namespace TAS
                         }
                         //sw2.Stop();
                         //Console.WriteLine(sw2.Elapsed);
-
                         ready = false;
                     }
-             
-                 
                 }
 
                 if (!Equals(e.Fields.GetSeriesStatusField().Value, market_state))
@@ -121,14 +130,11 @@ namespace TAS
                     Console.WriteLine("{0}: Current Market State is : {1}", 
                         DateTime.Now.TimeOfDay,
                         market_state);
-                    
                 }
-
-
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine(e.Error); 
+                Console.WriteLine(ex.Message); 
             }
         }
 

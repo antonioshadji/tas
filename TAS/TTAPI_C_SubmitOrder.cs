@@ -51,15 +51,15 @@ namespace TAS
             switch (type)
             {
                 case "A1":
-                    return AccountType.Agent1; 
+                    return AccountType.A1;
                 case "M1":
-                    return AccountType.MarketMaker1; 
+                    return AccountType.M1; 
                 case "P1":
-                    return AccountType.Principal1; 
+                    return AccountType.P1; 
                 case "G1":
-                    return AccountType.GiveUp1; 
+                    return AccountType.G1; 
                 case "U1":
-                    return AccountType.Unallocated1; 
+                    return AccountType.U1; 
                 default:
                     return AccountType.None;
             }
