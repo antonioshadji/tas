@@ -49,9 +49,9 @@ namespace TAS
 
             if (!api_products.Contains(inst))
             {
-                Console.WriteLine("Insturment Lookup event handler added");
                 req.Update += new EventHandler<InstrumentLookupSubscriptionEventArgs>(instrumentLookupSub);
                 req.Start();
+                Console.WriteLine("Instrument Lookup event handler added");
                 api_products.Add(inst);
             }
         }

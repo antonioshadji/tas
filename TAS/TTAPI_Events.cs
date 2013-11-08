@@ -6,7 +6,7 @@ namespace TAS
 
     using TradingTechnologies.TTAPI;
 
-    public class TTAPI_Events : IDisposable
+    public class TTAPI_Events : IDisposable 
     {
         /// <summary>
         /// Declare the TTAPI objects
@@ -19,19 +19,13 @@ namespace TAS
         private string password = string.Empty;
         private string ttConfig = "orders.ini";
 
-        private bool ready = true;
-
-
- 
         #region Constructors
    
         public TTAPI_Events(string u, string p, string c)
-          
         {
             username = u;
             password = p;
             ttConfig = c;
-
         } 
         #endregion
         
@@ -53,30 +47,31 @@ namespace TAS
         public void Init()
         {
             // Use "Universal Login" Login Mode
-            TTAPI.UniversalLoginModeDelegate ulDelegate = new
-            TTAPI.UniversalLoginModeDelegate(ttApiInitComplete);
-            TTAPI.CreateUniversalLoginTTAPI(Dispatcher.Current, ulDelegate);
+            ApiInitializeHandler d = new ApiInitializeHandler(ttApiInitHandler);
+            TTAPI.CreateUniversalLoginTTAPI(Dispatcher.Current, username, password, d);
         }
 
 
         /// <summary>
         /// Event notification for status of TT API initialization
         /// </summary>
-        public void ttApiInitComplete(UniversalLoginTTAPI api, Exception ex)
+        public void ttApiInitHandler(TTAPI api, Exception ex)
         {
             if (ex == null)
             {
                 Console.WriteLine("TT API Initialization Succeeded");
                 // Authenticate your credentials
-                apiInstance = api;
+                apiInstance = (UniversalLoginTTAPI)api;
                 apiInstance.AuthenticationStatusUpdate += new
                 EventHandler<AuthenticationStatusUpdateEventArgs>(
                 apiInstance_AuthenticationStatusUpdate);
-                apiInstance.Authenticate(username, password);
+                apiInstance.Start();
             }
             else
             {
                 Console.WriteLine("TT API Initialization Failed: {0}", ex.Message);
+                Console.WriteLine("press any key to exit");
+                Console.ReadKey();
                 Dispose();
             }
         }
@@ -119,26 +114,56 @@ namespace TAS
         /// </summary>
         public void Dispose()
         {
-            Debug.WriteLine("TTAPIFunctions::Dispose method called");
-            lock (m_lock)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                if (!disposed)
+                if (disposing)
                 {
-                    // Shutdown the TT API
-                    if (apiInstance != null)
-                    {
-                        apiInstance.Shutdown();
-                        apiInstance = null;
-                    }
+
+                    //// Shutdown all subscriptions
+                    //if (data != null)
+                    //{
+                    //    req.Dispose();
+                    //    req = null;
+                    //}
+                    //if (ps != null)
+                    //{
+                    //    ps.Dispose();
+                    //    ps = null;
+                    //}
+                    //if (ts != null)
+                    //{
+                    //    ts.Dispose();
+                    //    ts = null;
+                    //}
+
                     // Shutdown the Dispatcher
                     if (workDispatch != null)
                     {
                         workDispatch.BeginInvokeShutdown();
                         workDispatch = null;
                     }
-                    disposed = true;
+
+                    // Shutdown the TT API
+                    TTAPI.ShutdownCompleted += new EventHandler(TTAPI_ShutdownCompleted);
+                    TTAPI.Shutdown();
                 }
             }
+
+            disposed = true;
+        }
+
+
+        public void TTAPI_ShutdownCompleted(object sender, EventArgs e)
+        {
+            // Dispose of your other objects / resources
+            Console.WriteLine("exit application");
         }
 
 
