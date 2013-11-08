@@ -21,8 +21,6 @@ namespace TAS
 
         private bool ready = true;
 
-
- 
         #region Constructors
         private TTAPIEvents()
         {
@@ -45,7 +43,6 @@ namespace TAS
         } 
         #endregion
         
-        
         /// <summary>
         /// Create and start the Dispatcher
         /// </summary>
@@ -67,7 +64,6 @@ namespace TAS
             TTAPI.UniversalLoginModeDelegate(ttApiInitComplete);
             TTAPI.CreateUniversalLoginTTAPI(Dispatcher.Current, ulDelegate);
         }
-
 
         /// <summary>
         /// Event notification for status of TT API initialization
@@ -111,10 +107,6 @@ namespace TAS
             }
         }
 
-
-
- 
-
         /// <summary>
         /// Shuts down the TT API
         /// </summary>
@@ -141,10 +133,6 @@ namespace TAS
                 }
             }
         }
-
-
-
-
 
         }
     }
