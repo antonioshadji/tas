@@ -111,7 +111,7 @@ namespace TAS
                                 //sw.Stop();
                                 Console.WriteLine("Send Order Success : {0}", prof.SiteOrderKey);
                                 //Console.WriteLine(sw.Elapsed);
-
+                                ready = false;
                             }
                             else
                             {
@@ -120,7 +120,7 @@ namespace TAS
                         }
                         //sw2.Stop();
                         //Console.WriteLine(sw2.Elapsed);
-                        ready = false;
+                        
                     }
                 }
 
